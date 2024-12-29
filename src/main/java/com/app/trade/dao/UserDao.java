@@ -23,4 +23,7 @@ public class UserDao {
         return userExists;
     }
 
+    public User fetchUserByEmail(String email) {
+        return userRepo.findByEmail(email);
+    }
 }

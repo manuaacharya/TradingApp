@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,18 +38,21 @@ public class UserService {
             throw new UserExceptions("User Already Exists!!");
         }else{
             user.setPassword(encoder.encode(user.getPassword()));
-            user.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd:MM:YYYY HH:mm:ss:SSS")));
+            user.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY HH:mm:ss:SSS")));
             userDao.saveUser(user);
         }
         return user;
     }
 
     public String verify(User user) {
+        User existUser = userDao.fetchUserByEmail(user.getEmail());
+        user.setUserName(existUser.getUserName());
         Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUserName(), user.getPassword()));
         if (authentication.isAuthenticated()) {
             return jwtService.generateToken(user.getUserName());
         } else {
             return "fail";
         }
+
     }
 }
