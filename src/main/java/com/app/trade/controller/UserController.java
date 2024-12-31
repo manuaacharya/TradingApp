@@ -23,10 +23,14 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        logger.info("Inside register method -> registring the user [{}]",user);
-        return userService.registerUser(user);
-
+    public ResponseEntity<ApiResponse> register(@RequestBody User user) {
+        try{
+            logger.info("Inside register method -> registring the user [{}]",user);
+            User register = userService.registerUser(user);
+            return new ResponseEntity<>(new ApiResponse("Registration successful.", register.hashCode()), HttpStatus.OK);
+        }catch (Exception e) {
+            return new ResponseEntity<>(new ApiResponse("An error occured while registering the user.!!"), HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/login")
